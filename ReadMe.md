@@ -5,6 +5,6 @@ JSoup is a Java library for working with real-world HTML. It provides a very con
 
 #### To Start
 - Before running the application update the imgPath and csvPath variables found in src/main/java/Scraper App.java (lines 13 - 15) to your desired locations
-- Also add/update and desired attributes to the ArrayList infoCollected depending on the attirbutes you want to display in your csv. Currently only Title, Description and Image are available and are set by default. Title is a compulsory field and will always be included
+- Also add/update any desired attributes to the ArrayList infoCollected depending on the attirbutes you want to display in your csv. Currently only Title, Description and Image are available and are set by default. Title is a compulsory field and will always be included
 - **To run the application (assuming gradle is installed) enter "gradle run" into your command line.**
 
