@@ -2,6 +2,7 @@ package Scraper;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -24,14 +25,17 @@ public class HTMLParser {
   private String itemsPage;
   public List<String> itemLinks;
   public List< Map<String, String> > itemsInformation;
+  public List<String> infoCollected;
 
-  public HTMLParser(String itemsPage, String imgFolderPath) {
+  public HTMLParser(String itemsPage, String imgFolderPath, List<String> infoCollected) {
     this.itemsPage = itemsPage;
     this.imgFolderPath = imgFolderPath;
     this.itemLinks = new ArrayList<String>();
     this.itemsInformation = new ArrayList< Map<String, String> >();
+    this.infoCollected = infoCollected;
   }
 
+  //
   public List< Map<String, String> > parseItems() {
     System.out.printf("------Beginning Parsing items------\n");
     this.getItemLinks();
@@ -45,14 +49,14 @@ public class HTMLParser {
     return this.itemsInformation;
   }
 
-  public String exportToCSV(String filename, String[] infoCollected) throws IOException{
+  public String exportToCSV(String filename) throws IOException{
     System.out.println("----------Beginning Export----------");
     FileWriter export = new FileWriter(filename);
     
     String line = "";
-    for (int i = 0; i < infoCollected.length; i ++) {
-        line += infoCollected[i];
-        if (i != infoCollected.length - 1) {
+    for (int i = 0; i < this.infoCollected.size(); i ++) {
+        line += this.infoCollected.get(i);
+        if (i != this.infoCollected.size() - 1) {
             line += ", ";
         }
     }
@@ -64,10 +68,10 @@ public class HTMLParser {
     for (Map<String, String> map : this.itemsInformation) {
         line = "";
         title = map.get("Title");
-        for (int i = 0; i < infoCollected.length; i++) {
-            String attr = infoCollected[i];
+        for (int i = 0; i < this.infoCollected.size(); i++) {
+            String attr = this.infoCollected.get(i);
             line += map.get(attr).replace(",", "");
-            if (i != infoCollected.length - 1) {
+            if (i != this.infoCollected.size() - 1) {
                 line += ", ";
             }
         }
@@ -106,20 +110,24 @@ public class HTMLParser {
     try {
       doc = Jsoup.connect(url).get();
 
-      //title
-      String title = doc.getElementById("firstHeading").text();
+      //title - should always have title
+      String title = getTitle(doc);
       ret.put("Title", title);
 
       //description
-      ret.put("Description", getDescription(doc));
-
+      if (this.infoCollected.contains("Description")) ret.put("Description", getDescription(doc));
       //image
-      ret.put("Image path", getImage(doc, title));
+      if (this.infoCollected.contains("Title")) ret.put("Image path", getImage(doc, title));
+
     } catch (Exception e) {
       e.printStackTrace();
     }
 
     return ret;
+  }
+
+  private String getTitle(Document doc) {
+    return doc.getElementById("firstHeading").text();
   }
 
   private String getDescription(Document doc) {
@@ -133,7 +141,7 @@ public class HTMLParser {
     try {
       link = doc.getElementsByClass("infobox").first().getElementsByTag("a").first().getElementsByTag("img").first().attr("abs:src");
     } catch (Exception e) {
-      System.out.println(title + ":No Image found");
+      System.out.println("NO IMAGE FOUND: " + title);
       return "No Image found";
     }
     
@@ -146,7 +154,7 @@ public class HTMLParser {
       InputStream in = new URL(url).openStream();
       Files.copy(in, Paths.get(filePath));
     } catch (IOException e) {
-      System.out.printf("%s: %s\n",title,e);
+      System.out.printf("ERROR: %s | %s\n",title,e);
       // this is the case where the file already exists, most of the time TODO
       return filePath;
     }

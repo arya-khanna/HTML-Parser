@@ -13,12 +13,16 @@ public class App {
         String itemsUrl = "https://townshiptale.gamepedia.com/Category:Items";
         String imgPath = "/Users/ritukhanna/Downloads/Township/TownshipImages/";
         String csvPath = "/Users/ritukhanna/Downloads/Township/items.csv";
-        String[] infoCollected = new String[]{"Title", "Description", "Image path"};
 
-        HTMLParser parser = new HTMLParser(itemsUrl, imgPath);
+        // current options are "Title" "Description" "Image Path" 
+        // Always includes Title
+        List<String> infoCollected = new ArrayList<String>(); 
+        infoCollected.add("Title"); infoCollected.add("Description"); infoCollected.add("Image path");
+
+        HTMLParser parser = new HTMLParser(itemsUrl, imgPath, infoCollected);
         List< Map<String, String> > info = parser.parseItems();
         try {
-            parser.exportToCSV(csvPath, infoCollected);
+            parser.exportToCSV(csvPath);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Parser could not export to CSV");
