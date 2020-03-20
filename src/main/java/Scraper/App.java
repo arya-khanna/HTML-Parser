@@ -11,8 +11,8 @@ public class App {
     public static void main(String[] args) {
 
         String itemsUrl = "https://townshiptale.gamepedia.com/Category:Items";
-        String imgPath = "/Users/ritukhanna/Downloads/Township/TownshipImages/";
-        String csvPath = "/Users/ritukhanna/Downloads/Township/items.csv";
+        String imgPath = "ADD PATH";
+        String csvPath = "ADD PATH";
 
         // current options are "Title" "Description" "Image Path" 
         // Always includes Title
