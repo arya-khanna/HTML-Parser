@@ -19,13 +19,31 @@ import java.nio.file.Paths;
 import java.nio.file.Files;
 
 public class HTMLParser {
+  
   private static String imgFileFolder = "/Users/ritukhanna/Downloads/TownshipImages/";
 
-  public static List<String> getItems() {
-    return null;
+  public static List<String> getItems(String url) {
+    Document doc;
+    ArrayList<String> ret = new ArrayList<String>();
+    try {
+      doc = Jsoup.connect(url).get();
+
+      Elements list = doc.getElementsByClass("mw-category").first().getElementsByTag("li");
+      
+      for (Element elem: list) {
+        String link = elem.getElementsByTag("a").first().attr("abs:href");
+        ret.add(link);
+        // System.out.println(link);
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+    return ret;
   }
 
-  public static Map<String, String> getElements(String url) {
+  public static Map<String, String> getInformation(String url) {
     Map<String, String> ret = new HashMap<String, String>();
 
     Document doc;
