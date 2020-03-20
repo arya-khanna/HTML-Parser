@@ -20,7 +20,9 @@ public class App {
         infoCollected.add("Title"); infoCollected.add("Description"); infoCollected.add("Image path");
 
         HTMLParser parser = new HTMLParser(itemsUrl, imgPath, infoCollected);
-        List< Map<String, String> > info = parser.parseItems();
+        
+        parser.parseItems();
+        
         try {
             parser.exportToCSV(csvPath);
         } catch (IOException e) {
