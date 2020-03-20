@@ -57,7 +57,7 @@ public class HTMLParser {
     for (int i = 0; i < this.infoCollected.size(); i ++) {
         line += this.infoCollected.get(i);
         if (i != this.infoCollected.size() - 1) {
-            line += ", ";
+            line += ",";
         }
     }
     line += "\n";
@@ -72,7 +72,7 @@ public class HTMLParser {
             String attr = this.infoCollected.get(i);
             line += map.get(attr).replace(",", "");
             if (i != this.infoCollected.size() - 1) {
-                line += ", ";
+                line += ",";
             }
         }
         line += "\n";
@@ -135,7 +135,8 @@ public class HTMLParser {
     return description;
   }
 
-  // TODO: if no image exists, try to search for any other exisitng images on the page
+  // TODO: if no image exists, try to search for any other exisitng images on the page, look at example of shield
+  // Example shield, look at including all types of shields for example
   private String getImage(Document doc, String title) {
     String link;
     try {
