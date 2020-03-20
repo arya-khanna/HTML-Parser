@@ -1,7 +1,5 @@
 package Scraper;
 
-import java.io.IOException;
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +16,9 @@ import java.awt.Image;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class HTMLParser {
   private String imgFolderPath;
   private String itemsPage;
@@ -32,6 +33,7 @@ public class HTMLParser {
   }
 
   public List< Map<String, String> > parseItems() {
+    System.out.printf("------Beginning Parsing items------\n");
     this.getItemLinks();
     int count = 0;
     // System.out.println(this.itemLinks);
@@ -39,8 +41,44 @@ public class HTMLParser {
       this.itemsInformation.add( this.getItemInformation(url) );
       count ++;
     }
-    System.out.printf("------Parsed %d items------\n", count);
+    System.out.printf("-----------Parsed %d items----------\n\n", count);
     return this.itemsInformation;
+  }
+
+  public String exportToCSV(String filename, String[] infoCollected) throws IOException{
+    System.out.println("----------Beginning Export----------");
+    FileWriter export = new FileWriter(filename);
+    
+    String line = "";
+    for (int i = 0; i < infoCollected.length; i ++) {
+        line += infoCollected[i];
+        if (i != infoCollected.length - 1) {
+            line += ", ";
+        }
+    }
+    line += "\n";
+    export.write(line);
+
+    String title;
+    int count = 0;
+    for (Map<String, String> map : this.itemsInformation) {
+        line = "";
+        title = map.get("Title");
+        for (int i = 0; i < infoCollected.length; i++) {
+            String attr = infoCollected[i];
+            line += map.get(attr).replace(",", "");
+            if (i != infoCollected.length - 1) {
+                line += ", ";
+            }
+        }
+        line += "\n";
+        System.out.printf("Exported To CSV: %s\n",title);
+        export.write(line);
+        count++;
+    }
+    export.close();
+    System.out.printf("----Successfully Exported %d items to CSV----\n\n",count);
+    return filename;
   }
 
   private ArrayList<String> getItemLinks() {
@@ -70,13 +108,13 @@ public class HTMLParser {
 
       //title
       String title = doc.getElementById("firstHeading").text();
-      ret.put("title", title);
+      ret.put("Title", title);
 
       //description
-      ret.put("description", getDescription(doc));
+      ret.put("Description", getDescription(doc));
 
       //image
-      ret.put("image path", getImage(doc, title));
+      ret.put("Image path", getImage(doc, title));
     } catch (Exception e) {
       e.printStackTrace();
     }
