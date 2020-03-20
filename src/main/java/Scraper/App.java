@@ -10,21 +10,10 @@ import java.util.ArrayList;
 public class App {
     public static void main(String[] args) {
 
-        String homePage = "https://townshiptale.gamepedia.com/Category:Items";
-        String url = "https://townshiptale.gamepedia.com/Arrow";
+        String itemsUrl = "https://townshiptale.gamepedia.com/Category:Items";
+        String imgFolderPath = "/Users/ritukhanna/Downloads/TownshipImages/";
 
-        List<String> itemUrls = HTMLParser.getItems(homePage);
-        
-        List<Map<String, String>> attrList = new ArrayList<Map<String, String>>();
-
-        // for (int i = 0; i < urlList.size(); i ++) {
-        //     attrList.add(HTMLParser.getInformation(urlList.get(i)));
-        // }
-        
-        System.out.println(itemUrls);
-
-
-        // Map<String, String> elements = HTMLParser.getElements(url);
-        // System.out.println(elements);
+        HTMLParser parser = new HTMLParser(itemsUrl, imgFolderPath);
+        List< Map<String, String> > info = parser.parseItems();
     }
 }

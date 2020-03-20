@@ -19,23 +19,41 @@ import java.nio.file.Paths;
 import java.nio.file.Files;
 
 public class HTMLParser {
-  
-  private static String imgFileFolder = "/Users/ritukhanna/Downloads/TownshipImages/";
+  private String imgFolderPath;
+  private String itemsPage;
+  public List<String> itemLinks;
+  public List< Map<String, String> > itemsInformation;
 
-  public static List<String> getItems(String url) {
+  public HTMLParser(String itemsPage, String imgFolderPath) {
+    this.itemsPage = itemsPage;
+    this.imgFolderPath = imgFolderPath;
+    this.itemLinks = new ArrayList<String>();
+    this.itemsInformation = new ArrayList< Map<String, String> >();
+  }
+
+  public List< Map<String, String> > parseItems() {
+    this.getItemLinks();
+    int count = 0;
+    // System.out.println(this.itemLinks);
+    for (String url : itemLinks) {
+      this.itemsInformation.add( this.getItemInformation(url) );
+      count ++;
+    }
+    System.out.printf("------Parsed %d items------\n", count);
+    return this.itemsInformation;
+  }
+
+  private ArrayList<String> getItemLinks() {
     Document doc;
     ArrayList<String> ret = new ArrayList<String>();
     try {
-      doc = Jsoup.connect(url).get();
-
+      doc = Jsoup.connect(this.itemsPage).get();
       Elements list = doc.getElementsByClass("mw-category").first().getElementsByTag("li");
-      
       for (Element elem: list) {
         String link = elem.getElementsByTag("a").first().attr("abs:href");
-        ret.add(link);
+        this.itemLinks.add(link);
         // System.out.println(link);
       }
-
     } catch (Exception e) {
       e.printStackTrace();
       return null;
@@ -43,7 +61,7 @@ public class HTMLParser {
     return ret;
   }
 
-  public static Map<String, String> getInformation(String url) {
+  private Map<String, String> getItemInformation(String url) {
     Map<String, String> ret = new HashMap<String, String>();
 
     Document doc;
@@ -66,25 +84,33 @@ public class HTMLParser {
     return ret;
   }
 
-  private static String getDescription(Document doc) {
+  private String getDescription(Document doc) {
     String description = doc.getElementsByClass("mw-parser-output").first().getElementsByTag​("p").first().text();
     return description;
   }
 
-  private static String getImage(Document doc, String title) {
-    String link = doc.getElementsByClass("infobox").first().getElementsByTag("a").first().getElementsByTag("img").first().attr("abs:src");
+  // TODO: if no image exists, try to search for any other exisitng images on the page
+  private String getImage(Document doc, String title) {
+    String link;
+    try {
+      link = doc.getElementsByClass("infobox").first().getElementsByTag("a").first().getElementsByTag("img").first().attr("abs:src");
+    } catch (Exception e) {
+      System.out.println(title + ":No Image found");
+      return "No Image found";
+    }
+    
     return saveImage(link, title);
   }
 
-  private static String saveImage(String url, String title) {
-    Image image = null;
-    String filePath = imgFileFolder + title + ".png";
+  private String saveImage(String url, String title) {
+    String filePath = this.imgFolderPath + title + ".png";
     try {
       InputStream in = new URL(url).openStream();
       Files.copy(in, Paths.get(filePath));
     } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+      System.out.printf("%s: %s\n",title,e);
+      // this is the case where the file already exists, most of the time TODO
+      return filePath;
     }
     return filePath;
   }
